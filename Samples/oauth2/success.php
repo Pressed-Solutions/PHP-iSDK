@@ -35,3 +35,10 @@ if(isset($_GET['code'])){
 
     echo $data;
 }
+?>
+
+<style type="text/css">
+    .infusion-submit input[type="button"]:hover {
+
+    }
+</style>
