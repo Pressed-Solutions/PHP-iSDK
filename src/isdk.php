@@ -136,16 +136,13 @@ class iSDK
 
         if ($request['info']['http_code'] == 200) {
 
-            if ($data->mapi == $this->clientId) {
-                $tmp = explode('|', $data->scope);
-                $app = explode('.', $tmp[1]);
+            $tmp = explode('|', $data->scope);
+            $app = explode('.', $tmp[1]);
 
-                $data->applicationName = $app[0];
-                $this->setToken($data->access_token);
-                return $data;
-            } else {
-                throw new Exception('Invalid Map.', 400);
-            }
+            $data->applicationName = $app[0];
+            $this->setToken($data->access_token);
+            return $data;
+
         } else {
             switch (true) {
                 case is_object($data) && isset($data->error_description):
