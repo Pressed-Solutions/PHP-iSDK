@@ -3,9 +3,9 @@
  * @method Object Oriented PHP SDK with OAuth2 Support for Infusionsoft
  * @CreatedBy Justin Morris on 09-10-08
  * @UpdatedBy Michael Fairchild
- * @Updated 03/13/14
- * @iSDKVersion 2.1.2
- * @ApplicationVersion 1.29.x
+ * @Updated 01/07/2015
+ * @iSDKVersion 2.1.4
+ * @ApplicationVersion 1.36.x
  */
 
 if (!function_exists('xmlrpc_encode_entitites')) {
@@ -29,6 +29,7 @@ class iSDK
     protected $tokenEndpoint;
     protected $postURL;
     protected $token;
+    protected $refreshToken;
 
     public function __construct()
     {
@@ -36,7 +37,7 @@ class iSDK
         $this->authEndpoint = 'https://signin.infusionsoft.com/app/oauth/authorize';
         $this->tokenEndpoint = 'https://api.infusionsoft.com/token';
         $this->postURL = 'https://api.infusionsoft.com/crm/xmlrpc/v1';
-        $this->redirectURL = 'https://localhost/PHP-iSDK/Samples/oauth2/success.php'; //Note: This MUST be HTTPS and same as registered cllback url
+        $this->redirectURL = 'http://localhost/PHP-iSDK/Samples/oauth2/success.php'; //Note: This MUST be HTTPS and same as registered cllback url
     }
 
     public function getAuthorizationURL()
@@ -59,6 +60,15 @@ class iSDK
         }
     }
 
+    public function setRefreshToken($refreshToken = null)
+    {
+        if (!is_null($refreshToken)) {
+            $this->refreshToken = $refreshToken;
+        } else {
+            return $this->refreshToken;
+        }
+    }
+
     public function setClientId($id = null)
     {
         if (!is_null($id)) {
@@ -76,7 +86,7 @@ class iSDK
             $this->client = new xmlrpc_client($this->postURL . '?access_token=' . $token);
             $this->client->return_type = "phpvals";
             $this->client->setSSLVerifyPeer(TRUE);
-            $this->client->setCaCertificate((__DIR__ != '__DIR__' ? __DIR__ : dirname(__FILE__)) . '/infusionsoftoauth.pem');
+            $this->client->setCaCertificate((__DIR__ != '__DIR__' ? __DIR__ : dirname(__FILE__)) . '/infusionsoft.pem');
             $this->client->setDebug(0);
         } else {
             return $this->token;
@@ -119,6 +129,41 @@ class iSDK
         }
     }
 
+    public function refreshAccessToken($refreshToken = null){
+
+        if(is_null($refreshToken)){
+            $refreshToken = $this->refreshToken;
+        }
+
+        $params = array(
+            'grant_type'    => 'refresh_token',
+            'refresh_token' => $refreshToken,
+        );
+
+        $handle = curl_init($this->tokenEndpoint);
+
+        curl_setopt($handle, CURLOPT_POST, true);
+        curl_setopt($handle, CURLOPT_USERPWD, $this->clientId . ':' . $this->secret);
+        curl_setopt($handle, CURLOPT_POSTFIELDS, http_build_query($params));
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handle, CURLOPT_CAINFO, (__DIR__ != '__DIR__' ? __DIR__ : dirname(__FILE__)) . '/infusionsoft.pem');
+
+        $request = curl_exec($handle);
+        $info = curl_getinfo($handle);
+
+        curl_close($handle);
+
+        if (stripos($info['content_type'], 'application/json') !== false) {
+            $data = json_decode(trim($request));
+        }
+
+        $this->setToken($data->access_token);
+        $this->setRefreshToken($data->refresh_token);
+
+        return $request;
+
+    }
+
     public function authorize($code, $redirectURL = null, $clientId = null, $clientSecret = null, $grantType = 'authorization_code')
     {
 
@@ -141,6 +186,8 @@ class iSDK
 
             $data->applicationName = $app[0];
             $this->setToken($data->access_token);
+            $this->setRefreshToken($data->refresh_token);
+
             return $data;
 
         } else {
@@ -170,7 +217,7 @@ class iSDK
         curl_setopt($handle, CURLOPT_POST, true);
         curl_setopt($handle, CURLOPT_POSTFIELDS, http_build_query($params));
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($handle, CURLOPT_CAINFO, (__DIR__ != '__DIR__' ? __DIR__ : dirname(__FILE__)) . '/infusionsoftoauth.pem');
+        curl_setopt($handle, CURLOPT_CAINFO, (__DIR__ != '__DIR__' ? __DIR__ : dirname(__FILE__)) . '/infusionsoft.pem');
 
         $request = curl_exec($handle);
         $info = curl_getinfo($handle);

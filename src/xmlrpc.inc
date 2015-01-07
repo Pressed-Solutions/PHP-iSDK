@@ -36,7 +36,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 
-$GLOBALS['xmlrpcName'] = 'Infusionsoft PHP SDK OAuth V.03';
+$GLOBALS['xmlrpcName'] = 'Infusionsoft PHP iSDK OAuth V 2.1.4';
 $GLOBALS['xmlrpcVersion'] = '3.0.0.beta';
 
 if (!function_exists('xml_parser_create')) {

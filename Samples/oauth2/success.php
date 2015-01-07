@@ -3,10 +3,15 @@ require("../../src/isdk.php");
 
 $app = new iSDK();
 
-if(isset($_GET['code'])){
-    $app->setClientId('CLIENTID');
-    $app->setSecret('CLIENTSECRET');
+if (isset($_GET['code'])) {
+    $app->setClientId('CLIENT_ID');
+    $app->setSecret('CLIENT_SECRET');
+    $app->setRedirectURL('REDIRECT_URI');
     $app->authorize($_GET['code']);
+
+
+    $app->refreshAccessToken();
+
 
     $returnFields = array('Id', 'FirstName', 'LastName', 'Email');
 
