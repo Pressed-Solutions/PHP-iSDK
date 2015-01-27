@@ -1,7 +1,7 @@
 PHP iSDK
 ==================
 
-**Note:** This PHP-iSDK is depricated, and will be removed from Infusionsoft's public github on April, 30 2015.  Please use [infusionsoft-php](https://github.com/infusionsoft/infusionsoft-php) instead.
+**Note:** This PHP-iSDK is deprecated, and will be removed from Infusionsoft's public github on April, 30 2015.  Please use [infusionsoft-php](https://github.com/infusionsoft/infusionsoft-php) instead.
 
 This SDK allows developers to easily use the Infusionsoft API with PHP
 
